@@ -12,7 +12,7 @@ FROM base as deps
 
 WORKDIR /myapp
 
-ADD package.json .npmrc ./
+ADD package.json package-lock.json .npmrc ./
 RUN npm install --include=dev
 
 # Setup production node_modules
@@ -21,7 +21,7 @@ FROM base as production-deps
 WORKDIR /myapp
 
 COPY --from=deps /myapp/node_modules /myapp/node_modules
-ADD package.json .npmrc ./
+ADD package.json package-lock.json .npmrc ./
 RUN npm prune --omit=dev
 
 # Build the app
@@ -39,6 +39,11 @@ RUN npm run build
 
 # Finally, build the production image with minimal footprint
 FROM base
+
+ENV DATABASE_URL ""
+ENV SESSION_SECRET ""
+
+ENV INTEROPDATA_SECRET_KEY=""
 
 WORKDIR /myapp
 
